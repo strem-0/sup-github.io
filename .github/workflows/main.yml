@@ -1,40 +1,7 @@
-name: Build My Game APK
-on: [push, workflow_dispatch]
-
-jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
-
-      - name: Set up Java
-        uses: actions/setup-java@v4
-        with:
-          distribution: 'temurin'
-          java-version: '17'
-
-      - name: Set up Flutter
-        uses: subosito/flutter-action@v2
-        with:
-          channel: 'stable'
-
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.11'
-
-      - name: Install Flet CLI
-        run: |
-          python -m pip install --upgrade pip
-          python -m pip install "flet[cli]" --break-system-packages
-
-      - name: Build Standalone APK
-        run: |
-          flet build apk --no-config
-
-      - name: Upload APK Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: flet-app-apk
-          path: build/apk/*.apk
+- name: Build apk
+  # You may pin to the exact commit or the version.
+  # uses: MirkoMajkicProductDock/BuildAPK@24cc2d17f0c8e391166603bffe50f207b9d75859
+  uses: MirkoMajkicProductDock/BuildAPK@v0.0.1
+  with:
+    # Pass the flavour you want to build artefacts for
+    flavour: # optional, default is release
