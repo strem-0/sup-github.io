@@ -1,0 +1,20 @@
+name: Build My Game APK
+on: [push, workflow_dispatch]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install Flet and Build APK
+        run: |
+          pip install "flet[cli]"
+          flet build apk
+      - name: Upload APK Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: flet-app-apk
+          path: build/apk/*.apk
