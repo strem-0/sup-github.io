@@ -1,132 +1,315 @@
-<html lang="ar" dir="rtl"><head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>مشغل وبوابة YouTube TV</title>
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    }
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>طلب إشراف وعروض IPTV</title>
+    <style>
+        :root {
+            --primary-color: #ef4444; /* اللون الأحمر الفخم من الصورة */
+            --primary-hover: #dc2626;
+            --dark-bg: #0b111e;      /* لون الخلفية الداكنة من الصورة */
+            --card-bg: rgba(22, 30, 49, 0.7); /* صندوق شفاف مجهز للبلور */
+            --text-color: #f8fafc;
+            --blur-strength: 16px;   /* قوة تأثير البلور */
+        }
 
-    body {
-      min-height: 100vh;
-      background: linear-gradient(-45deg, #020617, #0f172a, #1e1b4b, #020617);
-      background-size: 400% 400%;
-      animation: gradientAnimation 12s ease infinite;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      padding: 20px;
-      overflow: hidden;
-    }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
 
-    @keyframes gradientAnimation {
-      0% { background-position: 0% 50%; }
-      50% { background-position: 100% 50%; }
-      100% { background-position: 0% 50%; }
-    }
+        /* حركات السير العميقة للخلفية (أنيميشن سفاح للخلفية) */
+        body {
+            background: radial-gradient(circle at center, #16223f 0%, var(--dark-bg) 100%);
+            color: var(--text-color);
+            padding: 20px;
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            overflow-x: hidden;
+        }
 
-    /* الحاوية الزجاجية البلورية */
-    .tv-card {
-      width: 100%;
-      max-width: 600px;
-      background: rgba(255, 255, 255, 0.03);
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      border-radius: 28px;
-      backdrop-filter: blur(35px);
-      -webkit-backdrop-filter: blur(35px);
-      box-shadow: 0 40px 100px rgba(0, 0, 0, 0.8);
-      padding: 35px;
-      text-align: center;
-    }
+        /* حاوية العروض المدعمة بالأنيميشن عند الدخول */
+        .container {
+            display: flex;
+            flex-wrap: wrap;
+            max-width: 1200px;
+            margin: 0 auto;
+            gap: 30px;
+            width: 100%;
+            animation: fadeInUp 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
 
-    h1 {
-      color: #fff;
-      font-size: 24px;
-      margin-bottom: 10px;
-      font-weight: 700;
-    }
+        /* الصناديق بتصميم زجاجي احترافي (Glassmorphism + Blur) */
+        .section-box {
+            flex: 1;
+            min-width: 320px;
+            background: var(--card-bg);
+            backdrop-filter: blur(var(--blur-strength));
+            -webkit-backdrop-filter: blur(var(--blur-strength));
+            padding: 40px;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s;
+        }
 
-    p {
-      color: rgba(255, 255, 255, 0.6);
-      font-size: 14px;
-      margin-bottom: 30px;
-      line-height: 1.6;
-    }
+        .section-box:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 30px 60px -10px rgba(239, 68, 68, 0.15);
+            border-color: rgba(239, 68, 68, 0.2);
+        }
 
-    /* حاوية الأزرار التفاعلية */
-    .button-group {
-      display: flex;
-      flex-direction: column;
-      gap: 15px;
-    }
+        h2 {
+            margin-bottom: 25px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 15px;
+            font-size: 1.6rem;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
 
-    .btn {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-      width: 100%;
-      padding: 16px;
-      border: none;
-      border-radius: 14px;
-      font-size: 16px;
-      font-weight: bold;
-      text-decoration: none;
-      cursor: pointer;
-      transition: all 0.3s ease;
-    }
+        /* تنسيق قسم التقديم والنسخ */
+        .instruction-box {
+            background: rgba(11, 17, 30, 0.6);
+            border: 1px dashed rgba(255, 255, 255, 0.15);
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            text-align: center;
+        }
 
-    /* زر تحميل الإضافة */
-    .btn-extension {
-      background: linear-gradient(135deg, #2563eb, #1d4ed8);
-      color: white;
-      box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3);
-    }
+        .email-highlight {
+            background-color: rgba(239, 68, 68, 0.1);
+            color: #f87171;
+            padding: 6px 14px;
+            border-radius: 6px;
+            font-weight: bold;
+            display: inline-block;
+            margin-top: 10px;
+            border: 1px solid rgba(239, 68, 68, 0.2);
+            user-select: all;
+        }
 
-    .btn-extension:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(37, 99, 235, 0.5);
-    }
+        .template-box {
+            background: rgba(11, 17, 30, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 20px;
+            border-radius: 12px;
+            color: #cbd5e1;
+            white-space: pre-line;
+            text-align: right;
+            font-family: monospace;
+            margin-bottom: 20px;
+            user-select: all;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
 
-    /* زر فتح واجهة التلفزيون */
-    .btn-tv {
-      background: linear-gradient(135deg, #ef4444, #dc2626);
-      color: white;
-      box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3);
-    }
+        .template-box:hover {
+            background: rgba(11, 17, 30, 0.9);
+        }
 
-    .btn-tv:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(239, 68, 68, 0.5);
-    }
+        /* زر النسخ والاشتراك المتوهج مثل الصورة تماماً */
+        .action-btn {
+            width: 100%;
+            padding: 16px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1.05rem;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4);
+        }
 
-    .footer-note {
-      margin-top: 30px;
-      font-size: 12px;
-      color: rgba(255, 255, 255, 0.35);
-      line-height: 1.5;
-    }
-  </style>
+        .action-btn:hover {
+            background-color: var(--primary-hover);
+            transform: scale(1.02);
+            box-shadow: 0 8px 25px rgba(239, 68, 68, 0.6);
+        }
+
+        .action-btn:active {
+            transform: scale(0.98);
+        }
+
+        /* نص "قريباً" أسفل زر الاشتراك */
+        .soon-text {
+            display: block;
+            margin-top: 8px;
+            font-size: 0.85rem;
+            color: #94a3b8;
+            letter-spacing: 1px;
+        }
+
+        /* تنسيق عروض IPTV */
+        .legal-notice {
+            background: rgba(56, 189, 248, 0.1);
+            color: #38bdf8;
+            padding: 12px;
+            border-radius: 10px;
+            margin-bottom: 25px;
+            font-size: 0.9rem;
+            text-align: center;
+            border: 1px solid rgba(56, 189, 248, 0.2);
+        }
+
+        .plan-card {
+            background: rgba(11, 17, 30, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 14px;
+            padding: 25px;
+            margin-bottom: 20px;
+            text-align: center;
+            transition: border-color 0.3s, transform 0.3s;
+        }
+
+        .plan-card:hover {
+            border-color: rgba(255, 255, 255, 0.15);
+        }
+
+        .price {
+            font-size: 2rem;
+            color: #fff;
+            margin: 15px 0;
+            font-weight: 700;
+        }
+
+        /* شاشة قريباً المنبثقة بتأثير بلور فخم جداً */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(7, 11, 20, 0.6);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+
+        .modal.show {
+            display: flex;
+            opacity: 1;
+        }
+
+        .modal-content {
+            background: var(--card-bg);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(var(--blur-strength));
+            padding: 50px 40px;
+            border-radius: 24px;
+            text-align: center;
+            max-width: 420px;
+            width: 90%;
+            position: relative;
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.8);
+            transform: scale(0.85);
+            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .modal.show .modal-content {
+            transform: scale(1);
+        }
+
+        .modal-content h3 {
+            font-size: 2.2rem;
+            color: #fff;
+            margin-bottom: 12px;
+            font-weight: 700;
+        }
+
+        .modal-content p {
+            font-size: 1rem;
+            color: #94a3b8;
+            letter-spacing: 0.5px;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 1.8rem;
+            color: #64748b;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+        
+        .close-btn:hover {
+            color: #fff;
+        }
+
+        /* تأثيرات الأنيميشن (Keyframes) */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(40px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
 </head>
 <body>
 
-  <div class="tv-card">
-    <h1></h1>
-    <p>تم نقل موقعنا الى موقع جديد  يرجى الضغط على الزر لاحمر للانتقال اليه</p>
-
-    <div class="button-group">
+    <div class="container">
         
+        <!-- قسم التقديم على إدارة الموقع -->
+        <div class="section-box">
+            <h2>التقديم على طلب مشرف (Admin)</h2>
+            
+            <div class="instruction-box">
+                <p>يرجى نسخ النموذج أدناه وتعبئته، ثم إرساله إلى بريدنا الإلكتروني التالي:</p>
+                <div class="email-highlight">dianaaldaiai@gmail.com</div>
+            </div>
 
-      <!-- زر فتح YouTube TV في نافذة جديدة -->
-      <a href="https://www.strem-0.github.io.com" target="_blank" class="btn btn-tv">اضغط هنا للدخول الى موقعنا الجديد</a>
+            <label style="font-size: 0.9rem; color: #94a3b8; display:block; margin-bottom:8px;">اضغط داخل المربع لنسخ النموذج:</label>
+            <div class="template-box" id="templateText" onclick="copyTemplate()">الاسم الكامل: 
+العمر: 
+الخبرات السابقة في إدارة المواقع: 
+لماذا تريد الانضمام لفريقنا؟: </div>
+
+            <button class="action-btn" onclick="copyTemplate()">نسخ النموذج الحالي</button>
+        </div>
+
+        <!-- قسم عروض IPTV القانونية -->
+        <div class="section-box">
+            <h2>عروض اشتراكات IPTV القانونية</h2>
+            <div class="legal-notice">
+                🔒 جميع الاشتراكات مرخصة وتحترم حقوق البث والنشر القانونية.
+            </div>
+
+            <!-- العرض الأول -->
+            <div class="plan-card">
+                <h3>الباقة الأساسية</h3>
+                <p style="color: #94a3b8; font-size: 0.95rem; margin-top: 5px;">تضم القنوات الرياضية والترفيهية بجودة HD</p>
+                <div class="price">9.99$ <span style="font-size: 1rem; color:#64748b;">/ شهرياً</span></div>
+                <button class="action-btn" onclick="showSoonModal()">اشترك الآن</button>
+                <span class="soon-text">قريباً... نحن نعمل على ذلك</span>
+            </div>
+
+            <!-- العرض الثاني -->
+            <div class="plan-card">
+                <h3>الباقة المميزة (Premium)</h3>
+                <p style="color: #94a3b8; font-size: 0.95rem; margin-top: 5px;">قنوات 4K + مكتبة أفلام ومسلسلات محدثة يومياً</p>
+                <div class="price" style="color: #f87171;">24.99$ <span style="font-size: 1rem; color:#64748b;">/ 3 أشهر</span></div>
+                <button class="action-btn" onclick="showSoonModal()">اشترك الآن</button>
+                <span class="soon-text">قريباً... نحن نعمل على ذلك</span>
+            </div>
+        </div>
+
     </div>
 
-    
-  </div>
-
-
-
-</body></html>
